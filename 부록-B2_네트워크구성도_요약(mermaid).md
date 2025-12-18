@@ -7,7 +7,7 @@
 
 ```mermaid
 flowchart LR
-  User[사용자/연구원] -->|실행| Script [xAI모델]
+  User[사용자/연구원] -->|실행| Script[xAI모델]
   Script -->|CSV 로드| Data[데이터.csv]
   Script -->|학습/평가| Model[RF 모델 학습/평가]
   Model -->|SHAP 계산| Shap[TreeExplainer/SHAP]
