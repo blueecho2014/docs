@@ -7,14 +7,13 @@
 
 ```mermaid
 flowchart LR
-  User[사용자/연구원] -->|실행| Script[Xai_ex.py]
-  Script -->|CSV 로드| Data1[data/irt_1216_all.csv]
-  Script -->|CSV 로드| Data2[data/toctoc_1216.csv]
+  User[사용자/연구원] -->|실행| Script[xAI모델]
+  Script -->|CSV 로드| Data[데이터.csv]
   Script -->|학습/평가| Model[RF 모델 학습/평가]
   Model -->|SHAP 계산| Shap[TreeExplainer/SHAP]
-  Shap -->|Top-N CSV| Out1[shap_top20_member*.csv]
-  Shap -->|막대그래프 PNG| Out2[shap_top20_member*.png]
-  Script -->|샘플 입력 저장| Out3[example1.json / example2.json]
+  Shap -->|Top-N CSV| Out1[shap_top20_member.csv]
+  Shap -->|막대그래프 PNG| Out2[shap_top20_member.png]
+  Script -->|샘플 입력 저장| Out3[example.json]
 ```
 
 ## 3. 2차년도(운영화 목표) 구성(권장 아키텍처)
