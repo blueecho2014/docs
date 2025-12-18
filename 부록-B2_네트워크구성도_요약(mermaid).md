@@ -7,17 +7,18 @@
 
 ```mermaid
 flowchart LR
-  User[사용자/연구원] -->|실행| Script[xAI모델]
-  Script -->|CSV 로드| Data[데이터.csv]
+  User[사용자/연구원] -->|실행| Script[Xai_ex.py]
+  Script -->|CSV 로드| Data1[data/irt_1216_all.csv]
+  Script -->|CSV 로드| Data2[data/toctoc_1216.csv]
   Script -->|학습/평가| Model[RF 모델 학습/평가]
   Model -->|SHAP 계산| Shap[TreeExplainer/SHAP]
-  Shap -->|Top-N CSV| Out1[shap_top20_member.csv]
-  Shap -->|막대그래프 PNG| Out2[shap_top20_member.png]
-  Script -->|샘플 입력 저장| Out3[example.json]
+  Shap -->|Top-N CSV| Out1[shap_top20_member*.csv]
+  Shap -->|막대그래프 PNG| Out2[shap_top20_member*.png]
+  Script -->|샘플 입력 저장| Out3[example1.json / example2.json]
 ```
 
 ## 3. 2차년도(운영화 목표) 구성(권장 아키텍처)
-> 예시 PPT의 “클라우드 아키텍처/Agent 워크플로우” 형태를 참고하여, 2차년도 목표(Agent, RAG, SaaS)를 반영한 목표 구성도임.
+> 2차년도 표에 포함된 “xAI 해석 증강용 파이프라인(Airflow/MLflow 등) + Agent/RAG + 설명 I/F(API/UI) + 운영 시스템”을 반영한 목표 구성도임.
 
 ```mermaid
 flowchart TB
@@ -29,6 +30,7 @@ flowchart TB
     API[Platform API]
     Auth[인증/권한]
     Log[로그/모니터링]
+    APIService[API Service]
   end
 
   subgraph AI[AI 서비스]
@@ -36,26 +38,42 @@ flowchart TB
     Expl[해석/설명 서비스(SHAP/설명 생성)]
     Agent[LLM Agent]
     RAG[RAG Retriever]
+    sLLM[sLLM]
   end
 
   subgraph Data[데이터/저장소]
+    LRS[(LRS)]
+    XAPI[xAPI 표준 I/F]
     FeatureDB[(학습/로그 DB)]
+    AnalysisDB[(분석 DB)]
     ExplainDB[(해석/설명 구조화 DB)]
     VecDB[(Vector DB)]
     DocStore[(문서/가이드 저장소)]
   end
 
+  subgraph MLOps[MLOps/파이프라인 관리]
+    Airflow[Airflow(파이프라인 관리자)]
+    MLflow[MLflow(MLOps 관리자)]
+  end
+
   UI --> API
   API --> Auth
   API --> Pred
-  Pred --> FeatureDB
+  XAPI --> LRS
+  LRS --> FeatureDB
+  FeatureDB --> AnalysisDB
+  Airflow --> FeatureDB
+  Airflow --> AnalysisDB
+  MLflow --> Pred
   Pred --> Expl
   Expl --> ExplainDB
-  Expl --> Agent
+  Expl --> sLLM
+  sLLM --> Agent
   Agent --> RAG
   RAG --> VecDB
   DocStore --> VecDB
-  API --> Log
+  API --> APIService
+  APIService --> Log
 ```
 
 ## 4. 증빙(현재 확보)
